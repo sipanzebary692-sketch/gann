@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Gann Empire - Telegram Active</title>
+    <style>
+        :root { --bg: #05070a; --card: #0f121a; --primary: #00a8ff; --gold: #f1c40f; --green: #00d2d3; --red: #ff4d4d; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; direction: rtl; }
+        .main-grid { display: grid; grid-template-columns: 1fr 380px; gap: 15px; }
+        .card { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #1e272e; margin-bottom: 10px; }
+        .signal-display { padding: 20px; border-radius: 10px; text-align: center; font-weight: bold; font-size: 26px; border: 2px solid #333; margin: 10px 0; }
+        .buy { border-color: var(--green); color: var(--green); box-shadow: 0 0 15px rgba(0,210,211,0.2); }
+        .sell { border-color: var(--red); color: var(--red); box-shadow: 0 0 15px rgba(255,77,77,0.2); }
+        .status-badge { background: #1e272e; padding: 5px 10px; border-radius: 20px; font-size: 12px; color: var(--primary); border: 1px solid var(--primary); }
+    </style>
+</head>
+<body>
+
+<div class="main-grid">
+    <div class="charts">
+        <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>دۆخی سیستەم: <span class="status-badge">چالاکە (تێلیگرام بەستراوە)</span></span>
+            <button onclick="testTelegram()" style="background:var(--primary); color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">تاقیکردنەوەی تێلیگرام</button>
+        </div>
+        <div class="card"><div id="tv_tsla" style="height: 400px;"></div></div>
+        <div class="card"><div id="tv_gold" style="height: 300px;"></div></div>
+    </div>
+
+    <div class="sidebar">
+        <div class="card">
+            <h2>سیستەمی سیگناڵی Gann</h2>
+            <div id="live-price" style="font-size: 32px; text-align: center; color: var(--gold); font-weight: bold;">$0.00</div>
+            <div id="signal-box" class="signal-display">Neutral</div>
+            <div style="display: flex; justify-content: space-between; text-align: center;">
+                <div>ستۆپ لۆس (SL)<br><b id="sl-val" style="color:var(--red);">--</b></div>
+                <div>تارگێت (TP)<br><b id="tp-val" style="color:var(--green);">--</b></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 style="color: #0088cc;">زانیاری تێلیگرام</h2>
+            <p style="font-size: 13px;">ID: 1397344355<br>Status: Connected ✅</p>
+        </div>
+    </div>
+</div>
+
+<audio id="alertSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
+
+<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+<script>
+    // زانیارییەکانت بە جێگیری لێرە داندراون
+    const botToken = "8666790930:AAGP2IRbkeDPv1PX66oZ9cNJl3Pw63j10ww";
+    const chatId = "1397344355";
+    let lastSignal = "";
+    let fakePrice = 2350.00;
+
+    // بارکردنی چارتەکان
+    new TradingView.widget({ "width": "100%", "height": 400, "symbol": "NASDAQ:TSLA", "interval": "D", "theme": "dark", "container_id": "tv_tsla" });
+    new TradingView.widget({ "width": "100%", "height": 300, "symbol": "OANDA:XAUUSD", "interval": "1", "theme": "dark", "container_id": "tv_gold" });
+
+    // فەنکشنی ناردنی نامە بۆ تێلیگرام
+    async function sendTelegram(msg) {
+        const url =' https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(msg)}';
+        try {
+            await fetch(url);
+        } catch (e) {
+            console.error("هەڵە لە ناردنی نامە بۆ تێلیگرام");
+        }
+    }
+
+    // تاقیکردنەوەی تێلیگرام بە دەستی
+    function testTelegram() {
+        sendTelegram("✅ سڵاو! سیستەمی سیگناڵەکەت بە سەرکەوتوویی بەسترا بە تێلیگرامەوە.");
+        alert("نامەی تاقیكردنەوە نێردرا! سەیری تێلیگرامەکەت بکە.");
+    }
+
+    // لۆجیکی جوڵەی بازاڕ و سیگناڵ
+    function simulateMarket() {
+        fakePrice += (Math.random() * 2) - 1;
+        document.getElementById('live-price').innerText = "$" + fakePrice.toFixed(2);
+
+        let root = Math.sqrt(fakePrice);
+        let gUp = Math.pow(root + 0.2, 2); // ئاستەکانمان نزیک کردووەتەوە بۆ تێست
+        let gDown = Math.pow(root - 0.2, 2);
+
+        if (fakePrice <= gDown + 0.1) {
+            updateSignal("BUY", fakePrice, gDown - 2, gUp + 2);
+        } else if (fakePrice >= gUp - 0.1) {
+            updateSignal("SELL", fakePrice, gUp + 2, gDown - 2);
+        }
+    }
+
+    function updateSignal(side, entry, sl, tp) {
+        if (side !== lastSignal) {
+            const box = document.getElementById('signal-box');
+            box.innerText = side;
+            box.className = "signal-display " + side.toLowerCase();
+            document.getElementById('sl-val').innerText = sl.toFixed(2);
+            document.getElementById('tp-val').innerText = tp.toFixed(2);
+            document.getElementById('alertSound').play().catch(()=>{});
+
+            // ناردنی نامە بۆ تێلیگرام
+            const message = '🚀 سیگناڵی نوێ: ${side}\n💰 نرخ: ${entry.toFixed(2)}\n🛑 ستۆپ لۆس: ${sl.toFixed(2)}\n🎯 تارگێت: ${tp.toFixed(2)}';
+            sendTelegram(message);
+            
+            lastSignal = side;
+        }
+    }
+
+    setInterval(simulateMarket, 3000);
+</script>
+</body>
+</html>
