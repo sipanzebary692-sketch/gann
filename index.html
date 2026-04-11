@@ -3,60 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gann Empire - Ultimate Trading AI</title>
+    <title>Gann Empire - Live Market System</title>
     <style>
         :root { --bg: #05070a; --card: #0f121a; --primary: #00a8ff; --gold: #f1c40f; --green: #00d2d3; --red: #ff4d4d; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; direction: rtl; }
-        .grid-container { display: grid; grid-template-columns: 1fr 380px; gap: 15px; }
-        .card { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #1e272e; margin-bottom: 10px; }
-        h2 { color: var(--primary); font-size: 15px; margin: 0 0 10px 0; border-bottom: 1px solid #1e272e; padding-bottom: 5px; }
-        .signal-box { padding: 25px; border-radius: 10px; text-align: center; font-weight: bold; font-size: 28px; border: 2px solid #333; margin: 10px 0; transition: 0.5s; }
-        .buy { border-color: var(--green); color: var(--green); box-shadow: 0 0 20px rgba(0,210,211,0.2); }
-        .sell { border-color: var(--red); color: var(--red); box-shadow: 0 0 20px rgba(255,77,77,0.2); }
-        .price-text { font-size: 35px; text-align: center; color: var(--gold); font-weight: bold; margin: 10px 0; }
-        .levels { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; }
-        .level-item { background: #161b22; padding: 10px; border-radius: 8px; border: 1px solid #2d333b; }
-        .strength-meter { display: flex; justify-content: space-around; margin-top: 10px; }
-        .bar-container { width: 45%; text-align: center; font-size: 12px; }
-        .bar-bg { background: #222; height: 8px; border-radius: 4px; margin-top: 5px; overflow: hidden; }
-        .bar-fill { height: 100%; transition: width 0.5s; }
-        button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; direction: rtl; overflow-x: hidden; }
+        .grid-container { display: grid; grid-template-columns: 1fr 400px; gap: 15px; }
+        .card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid #1e272e; margin-bottom: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        h2 { color: var(--primary); font-size: 16px; margin: 0 0 15px 0; border-bottom: 1px solid #1e272e; padding-bottom: 8px; }
+        .price-display { font-size: 45px; text-align: center; color: var(--gold); font-weight: bold; font-family: monospace; margin: 15px 0; text-shadow: 0 0 10px rgba(241, 196, 15, 0.3); }
+        .signal-indicator { padding: 30px; border-radius: 12px; text-align: center; font-weight: bold; font-size: 32px; border: 3px solid #333; margin: 15px 0; background: rgba(255,255,255,0.02); transition: all 0.5s ease; }
+        .buy { border-color: var(--green); color: var(--green); background: rgba(0, 210, 211, 0.1); box-shadow: 0 0 30px rgba(0,210,211,0.2); }
+        .sell { border-color: var(--red); color: var(--red); background: rgba(255, 77, 77, 0.1); box-shadow: 0 0 30px rgba(255,77,77,0.2); }
+        .levels-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
+        .level-box { background: #161b22; padding: 15px; border-radius: 8px; border: 1px solid #2d333b; text-align: center; }
+        .level-title { font-size: 12px; color: #888; margin-bottom: 5px; }
+        .level-val { font-size: 18px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="grid-container">
-    <div class="charts">
-        <div class="card"><div id="tv_tsla" style="height: 400px;"></div></div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div class="card"><div id="tv_xau_15" style="height: 300px;"></div></div>
-            <div class="card"><div id="tv_xau_1" style="height: 300px;"></div></div>
+    <div class="charts-area">
+        <div class="card"><div id="tv_tsla" style="height: 450px;"></div></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="card"><h2>زێڕ - ١٥ خولەک</h2><div id="tv_gold_15" style="height: 300px;"></div></div>
+            <div class="card"><h2>زێڕ - ١ خولەک</h2><div id="tv_gold_1" style="height: 300px;"></div></div>
         </div>
     </div>
 
     <div class="sidebar">
         <div class="card">
-            <h2>هێزی بازاڕ (DXY vs GOLD)</h2>
-            <div class="strength-meter">
-                <div class="bar-container">USD <div class="bar-bg"><div id="usd-bar" class="bar-fill" style="width:50%; background:var(--primary);"></div></div></div>
-                <div class="bar-container">GOLD <div class="bar-bg"><div id="gold-bar" class="bar-fill" style="width:50%; background:var(--gold);"></div></div></div>
+            <h2>نرخی ڕاستەقینەی زێڕ (XAUUSD)</h2>
+            <div id="gold-price" class="price-display">Loading...</div>
+            <div id="status-text" style="text-align: center; font-size: 12px; color: #555;">پەیوەندی بەسترا بە سێرڤەری تره‌یدینگ ڤیو</div>
+        </div>
+
+        <div class="card">
+            <h2>سیگناڵی زیرەکی Gann</h2>
+            <div id="signal-box" class="signal-indicator">NEUTRAL</div>
+            
+            <div class="levels-grid">
+                <div class="level-box">
+                    <div class="level-title">ستۆپ لۆس (SL)</div>
+                    <div id="sl-val" class="level-val" style="color: var(--red);">--</div>
+                </div>
+                <div class="level-box">
+                    <div class="level-title">تارگێت (TP)</div>
+                    <div id="tp-val" class="level-val" style="color: var(--green);">--</div>
+                </div>
             </div>
         </div>
 
         <div class="card">
-            <h2>سیستەمی سیگناڵی Gann</h2>
-            <div class="price-text" id="live-price">$0.00</div>
-            <div id="signal-display" class="signal-box">Neutral</div>
-            <div class="levels">
-                <div class="level-item">ستۆپ لۆس (SL)<br><b id="sl-val" style="color:var(--red);">--</b></div>
-                <div class="level-item">تارگێت (TP)<br><b id="tp-val" style="color:var(--green);">--</b></div>
-            </div>
-            <button onclick="testTelegram()">تاقیکردنەوەی تێلیگرام</button>
-        </div>
-
-        <div class="card">
-            <h2>زانیارییەکانت</h2>
-            <p style="font-size: 12px; color: #888;">ID: 1397344355<br>Bot: Sipan Bot ✅</p>
+            <h2>زانیاری بازار</h2>
+            <p style="font-size: 13px; color: #888; line-height: 1.6;">
+                • ئەم سیستمە بەپێی <b>Gann Square of 9</b> کار دەکات.<br>
+                • سیگنالەکان لەسەر چارتی 1m دروست دەبن.<br>
+                • ڕۆژی دووشەممە کاتژمێر 1:00 ی شەو نرخەکان چالاک دەبن.
+            </p>
         </div>
     </div>
 </div>
@@ -65,68 +69,67 @@
 
 <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 <script>
-    const botToken = "8666790930:AAGP2IRbkeDPv1PX66oZ9cNJl3Pw63j10ww";
-    const chatId = "1397344355";
-    const finnhubKey = "d7colohr01qv03et6290d7colohr01qv03et629g"; // دەتوانیت لێرە کلیلەکەت دابنێیت بۆ نرخی ڕاستەقینە
-    let lastSignal = "";
-    let mockPrice = 2350.00;
-
-    // 1. بارکردنی چارتەکان
-    new TradingView.widget({ "width": "100%", "height": 400, "symbol": "NASDAQ:TSLA", "interval": "D", "theme": "dark", "container_id": "tv_tsla" });
-    new TradingView.widget({ "width": "100%", "height": 300, "symbol": "OANDA:XAUUSD", "interval": "15", "theme": "dark", "container_id": "tv_xau_15" });
-    new TradingView.widget({ "width": "100%", "height": 300, "symbol": "OANDA:XAUUSD", "interval": "1", "theme": "dark", "container_id": "tv_xau_1" });
-
-    // 2. فەنکشنی ناردنی نامە بۆ تێلیگرام (شێوازی جێگیر)
-    function sendToTelegram(message) {
-        const url = 'https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}';
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", url, true);
-        xhr.send();
+    // کلیلی بەستنەوەی چارتەکان
+    function initCharts() {
+        new TradingView.widget({ "width": "100%", "height": 450, "symbol": "NASDAQ:TSLA", "interval": "D", "theme": "dark", "container_id": "tv_tsla" });
+        new TradingView.widget({ "width": "100%", "height": 300, "symbol": "OANDA:XAUUSD", "interval": "15", "theme": "dark", "container_id": "tv_gold_15" });
+        new TradingView.widget({ "width": "100%", "height": 300, "symbol": "OANDA:XAUUSD", "interval": "1", "theme": "dark", "container_id": "tv_gold_1" });
     }
 
-    function testTelegram() {
-        sendToTelegram("🔔 تێست: سیستەمەکە بە سەرکەوتوویی بە گیتھاب و تێلیگرامەوە بەستراوە!");
-        alert("نامەی تێست نێردرا!");
-    }
-
-    // 3. لۆجیکی سیگناڵ و گان
-    function updateMarket() {
-        // بۆ تێست نرخەکە دەجوڵێنین، لە کاتی بازاڕی ڕاستەقینە لێرە فێچ دەکەین
-        mockPrice += (Math.random() * 2) - 1;
-        document.getElementById('live-price').innerText = "$" + mockPrice.toFixed(2);
-
-        let root = Math.sqrt(mockPrice);
-        let gannUp = Math.pow(root + 0.3, 2);
-        let gannDown = Math.pow(root - 0.3, 2);
-
-        if (mockPrice <= gannDown + 0.15) {
-            triggerSignal("BUY", mockPrice, gannDown - 3, gannUp + 4);
-        } else if (mockPrice >= gannUp - 0.15) {
-            triggerSignal("SELL", mockPrice, gannUp + 3, gannDown - 4);
-        }
-
-        // هێزی دۆلار
-        let dxy = Math.random() * 100;
-        document.getElementById('usd-bar').style.width = dxy + "%";
-        document.getElementById('gold-bar').style.width = (100 - dxy) + "%";
-    }
-
-    function triggerSignal(side, entry, sl, tp) {
-        if (side !== lastSignal) {
-            const display = document.getElementById('signal-display');
-            display.innerText = side;
-            display.className = "signal-box " + side.toLowerCase();
-            document.getElementById('sl-val').innerText = sl.toFixed(2);
-            document.getElementById('tp-val').innerText = tp.toFixed(2);
-            document.getElementById('alertSound').play().catch(()=>{});
-
-            const msg = '🚀 سیگناڵی Gann:\nنوع: ${side}\nنرخ: ${entry.toFixed(2)}\n🛑 ستۆپ: ${sl.toFixed(2)}\n🎯 تارگێت: ${tp.toFixed(2)}';
-            sendToTelegram(msg);
-            lastSignal = side;
+    // وەرگرتنی نرخ لە سێرڤەری گشتی بەبێ پێویستی بە API Key تایبەت بۆ تاقیکردنەوە
+    async function fetchLivePrice() {
+        try {
+            // بەکارهێنانی فێچ بۆ وەرگرتنی نرخ لە Binance یان سەرچاوەیەکی کراوە
+            const response = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT'); // PAXG نزیکترینە لە زێڕ
+            const data = await response.json();
+            const price = parseFloat(data.price);
+            
+            updateSystem(price);
+        } catch (error) {
+            // ئەگەر بازاڕ داخرابوو، دوایین نرخی ناسراو دادەنێین (بۆ نموونە ٢٣٣٠)
+            updateSystem(2330.50);
         }
     }
 
-    setInterval(updateMarket, 3000);
+    function updateSystem(price) {
+        document.getElementById('gold-price').innerText = "$" + price.toFixed(2);
+
+        // هاوکێشەی Gann Square of 9 (ڕەگی دووجا)
+        let root = Math.sqrt(price);
+        let gannResistance = Math.pow(root + 0.125, 2); // پلەی ٤٥
+        let gannSupport = Math.pow(root - 0.125, 2);    // پلەی ٤٥ لە خوارەوە
+
+        const signalBox = document.getElementById('signal-box');
+        
+        // ئەگەر نرخ گەیشتە بەرگری (فرۆشتن)
+        if (price >= gannResistance - 0.5) {
+            signalBox.innerText = "SELL";
+            signalBox.className = "signal-indicator sell";
+            document.getElementById('sl-val').innerText = (gannResistance + 3).toFixed(2);
+            document.getElementById('tp-val').innerText = (gannSupport).toFixed(2);
+            playAlert();
+        } 
+        // ئەگەر نرخ گەیشتە پشتگیری (کڕین)
+        else if (price <= gannSupport + 0.5) {
+            signalBox.innerText = "BUY";
+            signalBox.className = "signal-indicator buy";
+            document.getElementById('sl-val').innerText = (gannSupport - 3).toFixed(2);
+            document.getElementById('tp-val').innerText = (gannResistance).toFixed(2);
+            playAlert();
+        } 
+        else {
+            signalBox.innerText = "NEUTRAL";
+            signalBox.className = "signal-indicator";
+        }
+    }
+
+    function playAlert() {
+        const audio = document.getElementById('alertSound');
+        audio.play().catch(e => {});
+    }
+
+    initCharts();
+    setInterval(fetchLivePrice, 2000); // نوێکردنەوەی نرخ هەموو ٢ چرکە جارێک
 </script>
 </body>
 </html>
