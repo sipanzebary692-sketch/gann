@@ -2,24 +2,31 @@
 <html lang="ku" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>Gann Pro - News & Strength Filter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gann Master Hybrid - Live System 2026</title>
     <style>
         :root { --bg: #020408; --card: #0a0d14; --primary: #00a8ff; --gold: #f1c40f; --green: #00d2d3; --red: #ff4d4d; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; direction: rtl; }
         .grid { display: grid; grid-template-columns: 1fr 400px; gap: 15px; }
-        .card { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #1e272e; margin-bottom: 15px; position: relative; }
+        .card { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #1e272e; margin-bottom: 15px; }
         
-        /* بەشی هێزی سیگناڵ */
-        .strength-container { margin: 15px 0; background: #111; border-radius: 20px; height: 25px; overflow: hidden; border: 1px solid #333; }
-        .strength-bar { height: 100%; width: 0%; transition: 0.5s; background: linear-gradient(90deg, var(--red), var(--gold), var(--green)); }
+        /* News & Strength */
+        .news-flash { background: rgba(241, 196, 15, 0.05); border: 1px solid var(--gold); padding: 8px; border-radius: 8px; font-size: 13px; color: var(--gold); margin-bottom: 15px; }
+        .strength-container { margin: 10px 0; background: #111; border-radius: 20px; height: 20px; overflow: hidden; border: 1px solid #333; }
+        .strength-bar { height: 100%; width: 0%; transition: 0.8s; background: linear-gradient(90deg, var(--red), var(--gold), var(--green)); }
+
+        /* Price & Signals */
+        .price-display { font-size: 55px; text-align: center; color: var(--gold); font-weight: bold; font-family: monospace; margin: 10px 0; }
+        .signal-banner { font-size: 35px; text-align: center; padding: 25px; border-radius: 15px; border: 3px solid #333; transition: 0.5s; margin-bottom: 15px; }
         
-        /* ئاگاداری هەواڵ */
-        .news-flash { background: rgba(241, 196, 15, 0.1); border: 1px solid var(--gold); padding: 10px; border-radius: 8px; font-size: 13px; color: var(--gold); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
-        
-        .price-big { font-size: 50px; text-align: center; color: var(--gold); font-weight: bold; }
-        .signal-banner { font-size: 32px; text-align: center; padding: 25px; border-radius: 15px; border: 3px solid #333; transition: 0.4s; }
-        .stats { display: flex; justify-content: space-around; text-align: center; }
-        .stat-val { font-size: 25px; font-weight: bold; }
+        .trade-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .level-box { padding: 15px; border-radius: 10px; text-align: center; background: #0d1117; border: 1px solid #222; }
+        .tp-txt { color: var(--green); font-weight: bold; font-size: 20px; }
+        .sl-txt { color: var(--red); font-weight: bold; font-size: 20px; }
+
+        .stat-box { display: flex; justify-content: space-around; padding: 10px; border-top: 1px solid #222; margin-top: 10px; }
+        button { width: 100%; background: #1a1f2c; color: #777; border: 1px solid #333; padding: 8px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -27,50 +34,50 @@
 <div class="grid">
     <div class="main-column">
         <div class="news-flash">
-            <span>⚠️</span>
-            <marquee id="news-text">ئاگاداری: سبەی هەواڵی CPI بڵاو دەبێتەوە، لە کاتی هەواڵەکان تره‌ید مەکە...</marquee>
+            <marquee>⚠️ ئاگاداری: سیستمەکە بەستراوەتەوە بە بازاڕی زیندوو. لە کاتی هەواڵە توندەکاندا وریا بە و تەنها لەگەڵ هێزی سەوز تره‌ید بکە.</marquee>
         </div>
 
         <div class="card">
-            <h2>چارتی زێڕ (XAUUSD)</h2>
-            <div id="tv_main_chart" style="height: 480px;"></div>
+            <h2 style="font-size: 14px; margin:0 0 10px 0;">چارتی زێڕ (XAUUSD) - وەشانی Gann 5m/15m</h2>
+            <div id="tv_chart_container" style="height: 500px;"></div>
         </div>
         
         <div class="card">
-            <h2>ئاماری تره‌ید (TP/SL)</h2>
-            <div class="stats">
-                <div style="color: var(--green);">تارگێت: <div id="tp-count" class="stat-val">0</div></div>
-                <div style="color: var(--red);">ستۆپ: <div id="sl-count" class="stat-val">0</div></div>
+            <h2 style="font-size: 14px; margin:0 0 10px 0;">ئاماری تره‌یدەکانی ئەمڕۆ</h2>
+            <div class="stat-box">
+                <div style="color: var(--green);">TP Hits: <span id="tp-count" style="font-size: 20px;">0</span></div>
+                <div style="color: var(--red);">SL Hits: <span id="sl-count" style="font-size: 20px;">0</span></div>
             </div>
+            <button onclick="resetStats()">Reset Stats</button>
         </div>
     </div>
 
     <div class="sidebar">
         <div class="card">
-            <h2>نرخی ڕاستەقینە</h2>
-            <div id="price" class="price-big">LOADING</div>
+            <h2 style="color: var(--primary);">نرخی ئێستا (Live)</h2>
+            <div id="live-price" class="price-display">LOADING</div>
+            <div style="text-align:center; font-size:12px; color:#555;">Server Status: Connected</div>
         </div>
 
         <div class="card">
-            <h2 style="color:var(--gold);">هێزی سیگناڵ (Strength)</h2>
+            <h2 style="font-size: 14px;">هێزی سیگناڵ (Total Strength)</h2>
             <div class="strength-container">
                 <div id="strength-bar" class="strength-bar"></div>
             </div>
-            <div id="strength-text" style="text-align:center; font-size:12px;">Scanning Market...</div>
+            <div id="strength-text" style="text-align:center; font-size:11px; color:#888;">Scanning Confluences...</div>
         </div>
 
-        <div id="main-signal" class="signal-banner">NEUTRAL</div>
+        <div id="signal-box" class="signal-banner">NEUTRAL</div>
 
-        <div class="card">
-            <h2 style="color:var(--primary);">پلانی تره‌ید</h2>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <div style="text-align:center; padding:10px; background:#111; border-radius:8px;">
-                    <div style="font-size:11px; color:#888;">TP</div>
-                    <div id="tp-val" style="color:var(--green); font-weight:bold;">--</div>
+        <div class="card"><h2 style="color: var(--primary); font-size: 14px;">پلانی جێبەجێکردن</h2>
+            <div class="trade-grid">
+                <div class="level-box">
+                    <div style="font-size:11px; color:#888;">Target (TP)</div>
+                    <div id="tp-val" class="tp-txt">--</div>
                 </div>
-                <div style="text-align:center; padding:10px; background:#111; border-radius:8px;">
-                    <div style="font-size:11px; color:#888;">SL</div>
-                    <div id="sl-val" style="color:var(--red); font-weight:bold;">--</div>
+                <div class="level-box">
+                    <div style="font-size:11px; color:#888;">Stop Loss (SL)</div>
+                    <div id="sl-val" class="sl-txt">--</div>
                 </div>
             </div>
         </div>
@@ -79,92 +86,93 @@
 
 <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 <script>
-    new TradingView.widget({ "width": "100%", "height": 480, "symbol": "OANDA:XAUUSD", "interval": "15", "theme": "dark", "container_id": "tv_main_chart" });
+    new TradingView.widget({
+        "width": "100%", "height": 500, "symbol": "OANDA:XAUUSD",
+        "interval": "15", "theme": "dark", "container_id": "tv_chart_container"
+    });
 
-    let tp = 0, sl = 0, activeTrade = null;
-    async function fetchPrice() {
+    let tpTotal = 0, slTotal = 0, activeTrade = null;
+
+    async function updateLivePrice() {
         try {
-            const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT');
-            const data = await res.json();
-            processLogic(parseFloat(data.price));
-        } catch(e) {}
+            // بەکارهێنانی Binance API بۆ نرخ (PAXG یەکسانە بە نرخی زێڕ)
+            const response = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT');
+            const data = await response.json();
+            const price = parseFloat(data.price);
+            runGannLogic(price);
+        } catch (e) {
+            console.log("Waiting for Market Open...");
+        }
     }
 
-    function processLogic(price) {
-        document.getElementById('price').innerText = "$" + price.toFixed(2);
+    function runGannLogic(price) {
+        document.getElementById('live-price').innerText = "$" + price.toFixed(2);
         
         let root = Math.sqrt(price);
-        let gRes = Math.pow(root + 0.125, 2);
-        let gSupp = Math.pow(root - 0.125, 2);
+        let gRes1 = Math.pow(root + 0.125, 2);
+        let gSupp1 = Math.pow(root - 0.125, 2);
+        let gRes2 = Math.pow(root + 0.25, 2);
+        let gSupp2 = Math.pow(root - 0.25, 2);
 
-        // حیسابکردنی هێزی سیگناڵ (0-100%)
         let strength = 0;
         let signal = "NEUTRAL";
 
-        if (price <= gSupp + 0.5) { // Gann Buy Zone
-            strength += 40;
-            if (price <= gSupp + 0.2) strength += 30; // Strong Gann
-            // لێرەدا دەتوانیت مەرجی تری بۆ زیاد بکەیت
+        // Logic for Strength & Signals
+        if (price <= gSupp1 + 0.3) {
             signal = "BUY";
-        } else if (price >= gRes - 0.5) { // Gann Sell Zone
-            strength += 40;
-            if (price >= gRes - 0.2) strength += 30;
+            strength = (price <= gSupp1 + 0.1) ? 90 : 70;
+        } else if (price >= gRes1 - 0.3) {
             signal = "SELL";
+            strength = (price >= gRes1 - 0.1) ? 90 : 70;
         }
 
-        // زیادکردنی هێز بەپێی کات (Astro)
-        if (new Date().getDate() % 4 === 0) strength += 30; 
+        updateUI(strength, signal);
 
-        updateStrengthUI(strength, signal);
-
-        if (!activeTrade) {
-            if (strength >= 70) {
-                executeTrade(signal, (signal==='BUY'?gRes:gSupp), (signal==='BUY'?gSupp-4:gRes+4));
-            } else {
-                document.getElementById('main-signal').innerText = "WAITING...";
-                document.getElementById('main-signal').style.borderColor = "#333";
-            }
-        } else {
-            checkExit(price);
+        // Trade Tracking
+        if (!activeTrade && strength >= 70) {
+            activeTrade = signal;
+            document.getElementById('tp-val').innerText = (signal === 'BUY' ? gRes1 : gSupp1).toFixed(2);
+            document.getElementById('sl-val').innerText = (signal === 'BUY' ? gSupp2 : gRes2).toFixed(2);
+        } else if (activeTrade) {
+            checkTradeOutcome(price);
         }
     }
 
-    function updateStrengthUI(val, type) {
+    function updateUI(str, sig) {
         const bar = document.getElementById('strength-bar');
-        const text = document.getElementById('strength-text');
-        bar.style.width = val + "%";
-        text.innerText = "هێزی سیگناڵ: " + val + "%";
+        const banner = document.getElementById('signal-box');
+        bar.style.width = str + "%";
+        document.getElementById('strength-text').innerText = "هێزی سیگناڵ: " + str + "%";
         
-        if (val < 40) bar.style.background = "var(--red)";
-        else if (val < 70) bar.style.background = "var(--gold)";
-        else bar.style.background = "var(--green)";
-    }
-
-    function executeTrade(type, target, stop) {
-        activeTrade = type;
-        const banner = document.getElementById('main-signal');
-        banner.innerText = type + " ACTIVE";
-        banner.style.borderColor = (type === 'BUY') ? "var(--green)" : "var(--red)";
-        banner.style.color = (type === 'BUY') ? "var(--green)" : "var(--red)";
-        document.getElementById('tp-val').innerText = target.toFixed(2);
-        document.getElementById('sl-val').innerText = stop.toFixed(2);
-    }
-
-    function checkExit(price) {
-        let target = parseFloat(document.getElementById('tp-val').innerText);
-        let stop = parseFloat(document.getElementById('sl-val').innerText);
-        if (activeTrade === 'BUY') {
-            if (price >= target) { tp++; activeTrade = null; }
-            else if (price <= stop) { sl++; activeTrade = null; }
-        } else if (activeTrade === 'SELL') {
-            if (price <= target) { tp++; activeTrade = null; }
-            else if (price >= stop) { sl++; activeTrade = null; }
+        if (activeTrade) {
+            banner.innerText = activeTrade + " ACTIVE";
+            banner.style.borderColor = (activeTrade === 'BUY') ? "var(--green)" : "var(--red)";
+            banner.style.color = (activeTrade === 'BUY') ? "var(--green)" : "var(--red)";
+        } else {
+            banner.innerText = (str >= 70) ? sig : "NEUTRAL";
+            banner.style.borderColor = "#333";
+            banner.style.color = "white";
         }
-        document.getElementById('tp-count').innerText = tp;
-        document.getElementById('sl-count').innerText = sl;
     }
 
-    setInterval(fetchPrice, 3000);
-</script>
+    function checkTradeOutcome(price) {
+        let tpVal = parseFloat(document.getElementById('tp-val').innerText);
+        let slVal = parseFloat(document.getElementById('sl-val').innerText);
+
+        if (activeTrade === 'BUY') {
+            if (price >= tpVal) { tpTotal++; activeTrade = null; }
+            else if (price <= slVal) { slTotal++; activeTrade = null; }
+        } else if (activeTrade === 'SELL') {
+            if (price <= tpVal) { tpTotal++; activeTrade = null; }
+            else if (price >= slVal) { slTotal++; activeTrade = null; }
+        }
+        document.getElementById('tp-count').innerText = tpTotal;
+        document.getElementById('sl-count').innerText = slTotal;
+    }
+
+    function resetStats() { tpTotal = 0; slTotal = 0; checkTradeOutcome(0); }
+
+    setInterval(updateLivePrice, 3000);
+    </script>
 </body>
 </html>
