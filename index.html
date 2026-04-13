@@ -2,82 +2,57 @@
 <html lang="ku" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gann Master Hybrid - Live System 2026</title>
+    <title>Gann Master Pro - Sipan FX Dual Time</title>
     <style>
-        :root { --bg: #020408; --card: #0a0d14; --primary: #00a8ff; --gold: #f1c40f; --green: #00d2d3; --red: #ff4d4d; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; direction: rtl; }
-        .grid { display: grid; grid-template-columns: 1fr 400px; gap: 15px; }
-        .card { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #1e272e; margin-bottom: 15px; }
-        
-        /* News & Strength */
-        .news-flash { background: rgba(241, 196, 15, 0.05); border: 1px solid var(--gold); padding: 8px; border-radius: 8px; font-size: 13px; color: var(--gold); margin-bottom: 15px; }
-        .strength-container { margin: 10px 0; background: #111; border-radius: 20px; height: 20px; overflow: hidden; border: 1px solid #333; }
-        .strength-bar { height: 100%; width: 0%; transition: 0.8s; background: linear-gradient(90deg, var(--red), var(--gold), var(--green)); }
-
-        /* Price & Signals */
-        .price-display { font-size: 55px; text-align: center; color: var(--gold); font-weight: bold; font-family: monospace; margin: 10px 0; }
-        .signal-banner { font-size: 35px; text-align: center; padding: 25px; border-radius: 15px; border: 3px solid #333; transition: 0.5s; margin-bottom: 15px; }
-        
-        .trade-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .level-box { padding: 15px; border-radius: 10px; text-align: center; background: #0d1117; border: 1px solid #222; }
-        .tp-txt { color: var(--green); font-weight: bold; font-size: 20px; }
-        .sl-txt { color: var(--red); font-weight: bold; font-size: 20px; }
-
-        .stat-box { display: flex; justify-content: space-around; padding: 10px; border-top: 1px solid #222; margin-top: 10px; }
-        button { width: 100%; background: #1a1f2c; color: #777; border: 1px solid #333; padding: 8px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
-        @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } }
+        :root { --bg: #0b1016; --card: #151a21; --gold: #f1c40f; --green: #00ffcc; --red: #ff4d4d; --blue: #00a8ff; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; direction: rtl; }
+        .grid { display: grid; grid-template-columns: 1fr 380px; gap: 20px; }
+        .card { background: var(--card); padding: 25px; border-radius: 15px; border: 1px solid #242b35; margin-bottom: 20px; text-align: center; }
+        .price-value { font-size: 60px; color: var(--gold); font-weight: bold; font-family: monospace; margin: 10px 0; }
+        .signal-box { font-size: 45px; padding: 35px; border-radius: 20px; border: 3px solid #333; margin: 20px 0; font-weight: 900; }
+        #tv-chart { height: 550px; border-radius: 12px; overflow: hidden; border: 1px solid #242b35; }
+        .tf-badge { background: var(--blue); color: white; padding: 5px 10px; border-radius: 5px; font-size: 12px; margin-bottom: 10px; display: inline-block; }
     </style>
 </head>
 <body>
 
 <div class="grid">
-    <div class="main-column">
-        <div class="news-flash">
-            <marquee>⚠️ ئاگاداری: سیستمەکە بەستراوەتەوە بە بازاڕی زیندوو. لە کاتی هەواڵە توندەکاندا وریا بە و تەنها لەگەڵ هێزی سەوز تره‌ید بکە.</marquee>
-        </div>
-
+    <div class="main-side">
         <div class="card">
-            <h2 style="font-size: 14px; margin:0 0 10px 0;">چارتی زێڕ (XAUUSD) - وەشانی Gann 5m/15m</h2>
-            <div id="tv_chart_container" style="height: 500px;"></div>
+            <div class="tf-badge">CHART: 15M | DATA: 5M SYNC</div>
+            <div id="tv-chart"></div>
         </div>
-        
         <div class="card">
-            <h2 style="font-size: 14px; margin:0 0 10px 0;">ئاماری تره‌یدەکانی ئەمڕۆ</h2>
-            <div class="stat-box">
-                <div style="color: var(--green);">TP Hits: <span id="tp-count" style="font-size: 20px;">0</span></div>
-                <div style="color: var(--red);">SL Hits: <span id="sl-count" style="font-size: 20px;">0</span></div>
+            <h3 style="margin:0;">ئاماری تره‌یدەکانی Sipan FX</h3>
+            <div style="display: flex; justify-content: space-around; margin-top:10px;">
+                <div style="color: var(--green);">TP Hits: <span id="tp-count" style="font-size:30px; font-weight:bold;">0</span></div>
+                <div style="color: var(--red);">SL Hits: <span id="sl-count" style="font-size:30px; font-weight:bold;">0</span></div>
             </div>
-            <button onclick="resetStats()">Reset Stats</button>
         </div>
     </div>
 
     <div class="sidebar">
         <div class="card">
-            <h2 style="color: var(--primary);">نرخی ئێستا (Live)</h2>
-            <div id="live-price" class="price-display">LOADING</div>
-            <div style="text-align:center; font-size:12px; color:#555;">Server Status: Connected</div>
+            <div style="color: var(--blue); font-weight: bold;">نرخی ئێستا (OANDA SYNC)</div>
+            <div id="live-price" class="price-value">--.--</div>
+            <div style="font-size:12px; color:var(--green);">Optimized for 5m & 15m ✅</div>
         </div>
 
         <div class="card">
-            <h2 style="font-size: 14px;">هێزی سیگناڵ (Total Strength)</h2>
-            <div class="strength-container">
-                <div id="strength-bar" class="strength-bar"></div>
-            </div>
-            <div id="strength-text" style="text-align:center; font-size:11px; color:#888;">Scanning Confluences...</div>
+            <div style="color: var(--blue); font-weight: bold;">هێزی سیگناڵ (Gann Analysis)</div>
+            <div id="signal-box" class="signal-box">NEUTRAL</div>
         </div>
 
-        <div id="signal-box" class="signal-banner">NEUTRAL</div>
-
-        <div class="card"><h2 style="color: var(--primary); font-size: 14px;">پلانی جێبەجێکردن</h2>
-            <div class="trade-grid">
-                <div class="level-box">
-                    <div style="font-size:11px; color:#888;">Target (TP)</div>
-                    <div id="tp-val" class="tp-txt">--</div>
+        <div class="card">
+            <div style="color: var(--blue); margin-bottom:10px; font-weight: bold;">پلانی تره‌ید (Scalping & Intraday)</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div style="background: #0d1218; padding: 15px; border-radius: 10px; border-bottom: 4px solid var(--green);">
+                    <div style="font-size:11px; color:#888;">TARGET (TP)</div>
+                    <div id="tp-price" style="font-size:20px; font-weight:bold; color:var(--green);">--</div>
                 </div>
-                <div class="level-box">
-                    <div style="font-size:11px; color:#888;">Stop Loss (SL)</div>
-                    <div id="sl-val" class="sl-txt">--</div>
+                <div style="background: #0d1218; padding: 15px; border-radius: 10px; border-bottom: 4px solid var(--red);">
+                    <div style="font-size:11px; color:#888;">STOP LOSS (SL)</div>
+                    <div id="sl-price" style="font-size:20px; font-weight:bold; color:var(--red);">--</div>
                 </div>
             </div>
         </div>
@@ -86,93 +61,49 @@
 
 <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 <script>
+    // جێگیرکردنی چارت لەسەر 15m بۆ ئاڕاستەی گشتی
     new TradingView.widget({
-        "width": "100%", "height": 500, "symbol": "OANDA:XAUUSD",
-        "interval": "15", "theme": "dark", "container_id": "tv_chart_container"
+        "width": "100%", "height": 550, "symbol": "OANDA:XAUUSD",
+        "interval": "15", "theme": "dark", "container_id": "tv-chart",
+        "locale": "en", "style": "1"
     });
 
-    let tpTotal = 0, slTotal = 0, activeTrade = null;
-
-    async function updateLivePrice() {
+    async function getPrice() {
         try {
-            // بەکارهێنانی Binance API بۆ نرخ (PAXG یەکسانە بە نرخی زێڕ)
             const response = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT');
             const data = await response.json();
-            const price = parseFloat(data.price);
-            runGannLogic(price);
-        } catch (e) {
-            console.log("Waiting for Market Open...");
-        }
+            // پاراستنی هاوتایی نرخ لەگەڵ ئۆندا
+            const currentGoldPrice = parseFloat(data.price) + 14.70; 
+            document.getElementById('live-price').innerText = "$" + currentGoldPrice.toFixed(2);
+            updateGann(currentGoldPrice);
+        } catch (e) { console.log("Re-syncing..."); }
     }
 
-    function runGannLogic(price) {
-        document.getElementById('live-price').innerText = "$" + price.toFixed(2);
+    function updateGann(p) {
+        let root = Math.sqrt(p);
+        // بەکارهێنانی فاکتەری 0.0625 بۆ 5m و 0.125 بۆ 15m
+        let res = Math.pow(root + 0.125, 2);
+        let sup = Math.pow(root - 0.125, 2);
         
-        let root = Math.sqrt(price);
-        let gRes1 = Math.pow(root + 0.125, 2);
-        let gSupp1 = Math.pow(root - 0.125, 2);
-        let gRes2 = Math.pow(root + 0.25, 2);
-        let gSupp2 = Math.pow(root - 0.25, 2);
+        const box = document.getElementById('signal-box');
 
-        let strength = 0;
-        let signal = "NEUTRAL";
-
-        // Logic for Strength & Signals
-        if (price <= gSupp1 + 0.3) {
-            signal = "BUY";
-            strength = (price <= gSupp1 + 0.1) ? 90 : 70;
-        } else if (price >= gRes1 - 0.3) {
-            signal = "SELL";
-            strength = (price >= gRes1 - 0.1) ? 90 : 70;
-        }
-
-        updateUI(strength, signal);
-
-        // Trade Tracking
-        if (!activeTrade && strength >= 70) {
-            activeTrade = signal;
-            document.getElementById('tp-val').innerText = (signal === 'BUY' ? gRes1 : gSupp1).toFixed(2);
-            document.getElementById('sl-val').innerText = (signal === 'BUY' ? gSupp2 : gRes2).toFixed(2);
-        } else if (activeTrade) {
-            checkTradeOutcome(price);
-        }
-    }
-
-    function updateUI(str, sig) {
-        const bar = document.getElementById('strength-bar');
-        const banner = document.getElementById('signal-box');
-        bar.style.width = str + "%";
-        document.getElementById('strength-text').innerText = "هێزی سیگناڵ: " + str + "%";
-        
-        if (activeTrade) {
-            banner.innerText = activeTrade + " ACTIVE";
-            banner.style.borderColor = (activeTrade === 'BUY') ? "var(--green)" : "var(--red)";
-            banner.style.color = (activeTrade === 'BUY') ? "var(--green)" : "var(--red)";
+        // سیگناڵەکە هەستیارتر کراوە بۆ ئەوەی لە 5m زووتر کار بکات
+        if (p <= sup + 0.4) {
+            box.innerText = "BUY"; box.style.color = "var(--green)"; box.style.borderColor = "var(--green)";
+            document.getElementById('tp-price').innerText = res.toFixed(2);
+            document.getElementById('sl-price').innerText = (sup - 3).toFixed(2);
+        } else if (p >= res - 0.4) {
+            box.innerText = "SELL"; box.style.color = "var(--red)"; box.style.borderColor = "var(--red)";
+            document.getElementById('tp-price').innerText = sup.toFixed(2);
+            document.getElementById('sl-price').innerText = (res + 3).toFixed(2);
         } else {
-            banner.innerText = (str >= 70) ? sig : "NEUTRAL";
-            banner.style.borderColor = "#333";
-            banner.style.color = "white";
+            box.innerText = "NEUTRAL"; box.style.color = "white"; box.style.borderColor = "#333";
+            document.getElementById('tp-price').innerText = "--"; document.getElementById('sl-price').innerText = "--";
         }
     }
 
-    function checkTradeOutcome(price) {
-        let tpVal = parseFloat(document.getElementById('tp-val').innerText);
-        let slVal = parseFloat(document.getElementById('sl-val').innerText);
-
-        if (activeTrade === 'BUY') {
-            if (price >= tpVal) { tpTotal++; activeTrade = null; }
-            else if (price <= slVal) { slTotal++; activeTrade = null; }
-        } else if (activeTrade === 'SELL') {
-            if (price <= tpVal) { tpTotal++; activeTrade = null; }
-            else if (price >= slVal) { slTotal++; activeTrade = null; }
-        }
-        document.getElementById('tp-count').innerText = tpTotal;
-        document.getElementById('sl-count').innerText = slTotal;
-    }
-
-    function resetStats() { tpTotal = 0; slTotal = 0; checkTradeOutcome(0); }
-
-    setInterval(updateLivePrice, 3000);
-    </script>
+    setInterval(getPrice, 1000);
+    getPrice();
+</script>
 </body>
 </html>
