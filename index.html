@@ -2,16 +2,16 @@
 <html lang="ku" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>Sipan FX - Advanced Multi-Zone System</title>
+    <title>Sipan FX - Persistent Signal Pro</title>
     <style>
         :root { --bg: #0b1016; --card: #151a21; --gold: #f1c40f; --green: #00ffcc; --red: #ff4d4d; --blue: #00a8ff; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; direction: rtl; }
         .grid { display: grid; grid-template-columns: 1fr 380px; gap: 20px; }
         .card { background: var(--card); padding: 25px; border-radius: 15px; border: 1px solid #242b35; margin-bottom: 20px; text-align: center; }
         .price-value { font-size: 60px; color: var(--gold); font-weight: bold; font-family: monospace; }
-        .signal-box { font-size: 45px; padding: 35px; border-radius: 20px; border: 3px solid #333; margin: 20px 0; font-weight: 900; transition: 0.5s; }
-        #tv-chart { height: 500px; border-radius: 12px; overflow: hidden; border: 1px solid #242b35; }
-        .zone-info { font-size: 14px; color: var(--blue); margin-top: 10px; }
+        .signal-box { font-size: 45px; padding: 35px; border-radius: 20px; border: 3px solid #333; margin: 20px 0; font-weight: 900; }
+        #tv-chart { height: 480px; border-radius: 12px; overflow: hidden; border: 1px solid #242b35; }
+        .plan-val { font-size: 24px; font-weight: bold; font-family: monospace; }
     </style>
 </head>
 <body>
@@ -20,34 +20,42 @@
     <div class="main-side">
         <div class="card"><div id="tv-chart"></div></div>
         <div class="card">
-            <h3 style="margin:0;">Sipan FX - Active Dual-Purpose Zones</h3>
-            <div style="font-size: 12px; color: #666; margin-top: 10px;">٥٣ زۆنی جێگیر چالاک کراون (بۆ کڕین و فرۆشتن)</div>
+            <h3 style="margin:0; color:var(--blue);">ئاماری تره‌یدەکانی Sipan FX</h3>
+            <div style="display:flex; gap:15px; margin-top:15px;">
+                <div style="flex:1; background:#0d1218; padding:15px; border-radius:10px; border-bottom:4px solid var(--green);">
+                    <div style="font-size:12px; color:#888;">TARGET HITS</div>
+                    <div id="tp-count" style="font-size:35px; color:var(--green); font-weight:bold;">0</div>
+                </div>
+                <div style="flex:1; background:#0d1218; padding:15px; border-radius:10px; border-bottom:4px solid var(--red);">
+                    <div style="font-size:12px; color:#888;">STOP HITS</div>
+                    <div id="sl-count" style="font-size:35px; color:var(--red); font-weight:bold;">0</div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="sidebar">
         <div class="card">
-            <div style="color: var(--blue); font-weight: bold;">نرخی ئۆندا (OANDA SYNC)</div>
+            <div style="color:var(--blue); font-weight:bold;">نرخی ئێستا</div>
             <div id="live-price" class="price-value">--.--</div>
-            <div id="active-zone" class="zone-info">چاوەڕێی نزیکبوونەوە لە زۆن...</div>
         </div>
 
         <div class="card">
-            <div style="color: var(--gold); font-weight: bold;">بڕیاری Sipan FX</div>
-            <div id="signal-box" class="signal-box">SCANNING</div>
-            <div id="hint-text" style="color:#888;">سیستمەکە بەدوای باشترین دەرفەتدا دەگەڕێت</div>
+            <div style="color:var(--gold); font-weight:bold;">بڕیاری Sipan FX</div>
+            <div id="signal-box" class="signal-box">NEUTRAL</div>
+            <div id="hint-text" style="color:#888;">سیستمەکە بەدوای زۆنەکاندا دەگەڕێت...</div>
         </div>
 
         <div class="card">
-            <div style="color: var(--blue); font-weight: bold; margin-bottom:10px;">پلانی تره‌ید (Scalping)</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div style="background: #0d1218; padding: 10px; border-radius: 8px; border-bottom: 3px solid var(--green);">
-                    <div style="font-size:10px;">TARGET (TP)</div>
-                    <div id="tp-price" style="color:var(--green); font-weight:bold;">--</div>
+            <div style="color:var(--blue); font-weight:bold; margin-bottom:15px;">پلانی جێگیر (6$ SL / 8$ TP)</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div style="background:#0d1218; padding:15px; border-radius:10px; border-right:4px solid var(--red);">
+                    <div style="font-size:10px; color:#888;">STOP LOSS</div>
+                    <div id="sl-price" class="plan-val" style="color:var(--red);">--</div>
                 </div>
-                <div style="background: #0d1218; padding: 10px; border-radius: 8px; border-bottom: 3px solid var(--red);">
-                    <div style="font-size:10px;">STOP (SL)</div>
-                    <div id="sl-price" style="color:var(--red); font-weight:bold;">--</div>
+                <div style="background:#0d1218; padding:15px; border-radius:10px; border-right:4px solid var(--green);">
+                    <div style="font-size:10px; color:#888;">TARGET</div>
+                    <div id="tp-price" class="plan-val" style="color:var(--green);">--</div>
                 </div>
             </div>
         </div>
@@ -56,65 +64,66 @@
 
 <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 <script>
-    new TradingView.widget({ "width": "100%", "height": 500, "symbol": "OANDA:XAUUSD", "interval": "5", "theme": "dark", "container_id": "tv-chart" });
+    new TradingView.widget({ "width": "100%", "height": 480, "symbol": "OANDA:XAUUSD", "interval": "5", "theme": "dark", "container_id": "tv-chart" });
 
-    // هەموو ٥٣ زۆنەکەی ناردبووت لێرە جێگیر کراون
-    const sipanZones = [
-        4359, 4372, 4385, 4398, 4412, 4425, 4438, 4452, 4465, 4478, 4492, 4505, 4519, 4532, 4546, 4559, 4573, 
-        4579, 4586, 4596, 4600, 4612, 4627, 4629, 4640, 4646, 4654, 4664, 4668, 4681, 4695, 4698, 4709, 4715, 
-        4732, 4736, 4749, 4750, 4764, 4767, 4778, 4784, 4792, 4801, 4805, 4818, 4819, 4833, 4847, 4861, 4875, 4889, 4903
-    ];
+    const sipanZones = [4359, 4372, 4385, 4398, 4412, 4425, 4438, 4452, 4465, 4478, 4492, 4505, 4519, 4532, 4546, 4559, 4573, 4579, 4586, 4596, 4600, 4612, 4627, 4629, 4640, 4646, 4654, 4664, 4668, 4681, 4695, 4698, 4709, 4715, 4732, 4736, 4749, 4750, 4764, 4767, 4778, 4784, 4792, 4801, 4805, 4818, 4819, 4833, 4847, 4861, 4875, 4889, 4903];
+    let lastPrice = 0, tpCount = 0, slCount = 0, activeTrade = null;
 
-    let lastPrice = 0;
-
-    async function processTrading() {
+    async function tick() {
         try {
             const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT');
             const data = await res.json();
-            const currentPrice = parseFloat(data.price) + 14.85; 
-            document.getElementById('live-price').innerText = currentPrice.toFixed(2);
+            const p = parseFloat(data.price) + 14.85; 
+            document.getElementById('live-price').innerText = p.toFixed(2);
 
-            const box = document.getElementById('signal-box');
-            const hint = document.getElementById('hint-text');
-            const zoneUI = document.getElementById('active-zone');
-            
-            let triggered = false;
-
-            for (let z of sipanZones) {
-                let diff = Math.abs(currentPrice - z);
-                
-                if (diff <= 0.65) { // مەودای ٦٥ سەنت بۆ سیگناڵ
-                    triggered = true;
-                    zoneUI.innerText = "نرخ لە زۆنی: " + z;
-                    
-                    if (lastPrice > currentPrice) { // ئەگەر نرخ لە سەرەوە دەهاتە خوارەوە
-                        box.innerText = "BUY"; box.style.color = "var(--green)";
-                        hint.innerText = "نرخ لە سەرەوە دابەزیوە بۆ سەر زۆن؛ بای بکە!";
-                        document.getElementById('tp-price').innerText = (z + 6).toFixed(2);
-                        document.getElementById('sl-price').innerText = (z - 3).toFixed(2);
-                    } else { // ئەگەر نرخ لە خوارەوە دەچووە سەرەوە
-                        box.innerText = "SELL"; box.style.color = "var(--red)";
-                        hint.innerText = "نرخ لە خوارەوە بەرزبووەتەوە بۆ سەر زۆن؛ سێڵ بکە!";
-                        document.getElementById('tp-price').innerText = (z - 6).toFixed(2);
-                        document.getElementById('sl-price').innerText = (z + 3).toFixed(2);
+            if (activeTrade) {
+                // سیگنالەکە لاناچێت تاوەکو نەگاتە ئەم مەرجانە:
+                if (activeTrade.type === 'BUY') {
+                    if (p >= activeTrade.tp) { tpCount++; activeTrade = null; resetUI(); }
+                    else if (p <= activeTrade.sl) { slCount++; activeTrade = null; resetUI(); }
+                } else if (activeTrade.type === 'SELL') {
+                    if (p <= activeTrade.tp) { tpCount++; activeTrade = null; resetUI(); }
+                    else if (p >= activeTrade.sl) { slCount++; activeTrade = null; resetUI(); }
+                }
+                if (!activeTrade) {
+                    document.getElementById('tp-count').innerText = tpCount;
+                    document.getElementById('sl-count').innerText = slCount;
+                }
+            } else {
+                for (let z of sipanZones) {
+                    if (Math.abs(p - z) <= 0.60) {
+                        if (lastPrice > p) { // کڕین (چونکە بازار دێتە خوار بۆ سەر زۆن)
+                            lockOrder('BUY', z, z + 8.00, z - 6.00);
+                        } else if (lastPrice < p) { // فرۆشتن (چونکە بازار دەچێتە سەر بۆ سەر زۆن)
+                            lockOrder('SELL', z, z - 8.00, z + 6.00);
+                        }
+                        break;
                     }
-                    break;
                 }
             }
-
-            if (!triggered) {
-                box.innerText = "NEUTRAL"; box.style.color = "white";
-                hint.innerText = "بازاڕ لە نێوان زۆنەکاندایە...";
-                zoneUI.innerText = "چاوەڕێی نزیکبوونەوە لە زۆن...";
-                document.getElementById('tp-price').innerText = "--";
-                document.getElementById('sl-price').innerText = "--";
-            }
-
-            lastPrice = currentPrice;
+            lastPrice = p;
         } catch (e) {}
     }
 
-    setInterval(processTrading, 1000);
+    function lockOrder(type, entry, tp, sl) {
+        activeTrade = { type, tp, sl };
+        const box = document.getElementById('signal-box');
+        box.innerText = type;
+        box.style.color = type === 'BUY' ? "var(--green)" : "var(--red)";
+        document.getElementById('hint-text').innerText =' تره‌یدی چالاک لە زۆنی ${entry}';
+        document.getElementById('tp-price').innerText = tp.toFixed(2);
+        document.getElementById('sl-price').innerText = sl.toFixed(2);
+    }
+
+    function resetUI() {
+        document.getElementById('signal-box').innerText = "NEUTRAL";
+        document.getElementById('signal-box').style.color = "white";
+        document.getElementById('hint-text').innerText = "چاوەڕێی زۆنێکی نوێ...";
+        document.getElementById('tp-price').innerText = "--";
+        document.getElementById('sl-price').innerText = "--";
+    }
+
+    setInterval(tick, 1000);
 </script>
 </body>
 </html>
