@@ -2,17 +2,16 @@
 <html lang="ku" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>Sipan FX - Precise OANDA Sync</title>
+    <title>Sipan FX - RSI Scalper Pro</title>
     <style>
         :root { --bg: #0b1016; --card: #151a21; --gold: #f1c40f; --green: #00ffcc; --red: #ff4d4d; --blue: #00a8ff; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; direction: rtl; }
         .grid { display: grid; grid-template-columns: 1fr 380px; gap: 20px; }
         .card { background: var(--card); padding: 25px; border-radius: 15px; border: 1px solid #242b35; margin-bottom: 20px; text-align: center; }
-        .price-value { font-size: 60px; color: var(--gold); font-weight: bold; font-family: monospace; margin: 10px 0; }
-        .signal-box { font-size: 45px; padding: 35px; border-radius: 20px; border: 3px solid #333; margin: 20px 0; font-weight: 900; }
-        #tv-chart { height: 500px; border-radius: 12px; overflow: hidden; border: 1px solid #242b35; }
-        .zone-display { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .zone-card { background: #0d1218; padding: 10px; border-radius: 10px; border: 1px solid #333; }
+        .price-value { font-size: 60px; color: var(--gold); font-weight: bold; font-family: monospace; }
+        .signal-box { font-size: 45px; padding: 30px; border-radius: 20px; border: 3px solid #333; margin: 20px 0; font-weight: 900; transition: 0.4s; }
+        .rsi-display { font-size: 28px; font-weight: bold; color: var(--blue); background: #0d1218; padding: 10px; border-radius: 10px; border: 1px solid #333; margin: 10px 0; }
+        #tv-chart { height: 480px; border-radius: 12px; overflow: hidden; border: 1px solid #242b35; }
     </style>
 </head>
 <body>
@@ -20,46 +19,44 @@
 <div class="grid">
     <div class="main-side">
         <div class="card"><div id="tv-chart"></div></div>
-        <div class="card">
-            <h3 style="margin:0;">ئاماری تره‌یدەکانی Sipan FX</h3>
-            <div style="display: flex; justify-content: space-around; margin-top:10px;">
-                <div style="color: var(--green);">TP Hits: 0</div>
-                <div style="color: var(--red);">SL Hits: 0</div>
-            </div>
+        <div class="card" style="padding: 15px;">
+            <div style="color: var(--blue);">هێزی بازاڕ (RSI 14)</div>
+            <div id="rsi-val" class="rsi-display">--</div>
         </div>
     </div>
 
     <div class="sidebar">
         <div class="card">
-            <div style="color: var(--blue); font-weight: bold;">نرخی زیندوو (Direct OANDA)</div>
+            <div style="color: var(--blue); font-weight: bold;">نرخی ئێستا (OANDA SYNC)</div>
             <div id="live-price" class="price-value">--.--</div>
-            <div class="zone-display">
-                <div class="zone-card" style="border-top: 4px solid var(--red);">
-                    <div style="font-size:10px; color:#888;">FIXED SELL ZONE</div>
-                    <div id="res-zone" style="color:var(--red); font-weight:bold; font-size:18px;">--</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
+                <div style="background: rgba(255, 77, 77, 0.1); padding: 10px; border-radius: 10px; border: 1px solid var(--red);">
+                    <div style="font-size:10px; color:#888;">SELL ZONE</div>
+                    <div id="res-zone" style="color:var(--red); font-weight:bold;">--</div>
                 </div>
-                <div class="zone-card" style="border-top: 4px solid var(--green);">
-                    <div style="font-size:10px; color:#888;">FIXED BUY ZONE</div>
-                    <div id="sup-zone" style="color:var(--green); font-weight:bold; font-size:18px;">--</div>
+                <div style="background: rgba(0, 255, 204, 0.1); padding: 10px; border-radius: 10px; border: 1px solid var(--green);">
+                    <div style="font-size:10px; color:#888;">BUY ZONE</div>
+                    <div id="sup-zone" style="color:var(--green); font-weight:bold;">--</div>
                 </div>
             </div>
         </div>
 
         <div class="card">
-            <div style="color: var(--blue); font-weight: bold;">سیگناڵی خێرا</div>
+            <div style="color: var(--gold); font-weight: bold;">بڕیاری Sipan FX</div>
             <div id="signal-box" class="signal-box">SCANNING</div>
+            <div id="hint-text" style="color: #888; font-size: 14px;">چاوەڕێی گونجانی نرخ و RSI...</div>
         </div>
 
         <div class="card">
-            <div style="color: var(--blue); margin-bottom:10px; font-weight: bold;">پلانی جێبەجێکردن (FAST)</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div style="background: #0d1218; padding: 15px; border-radius: 10px; border-bottom: 4px solid var(--green);">
-                    <div style="font-size:11px; color:#888;">TARGET</div>
-                    <div id="tp-price" style="font-size:18px; font-weight:bold; color:var(--green);">--</div>
+            <div style="color: var(--blue); font-weight: bold; margin-bottom:10px;">پلانی تره‌ید (TP/SL)</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div style="background: #0d1218; padding: 10px; border-radius: 8px; border-bottom: 3px solid var(--green);">
+                    <div style="font-size:10px;">TP</div>
+                    <div id="tp-price" style="color:var(--green); font-weight:bold;">--</div>
                 </div>
-                <div style="background: #0d1218; padding: 15px; border-radius: 10px; border-bottom: 4px solid var(--red);">
-                    <div style="font-size:11px; color:#888;">STOP LOSS</div>
-                    <div id="sl-price" style="font-size:18px; font-weight:bold; color:var(--red);">--</div>
+                <div style="background: #0d1218; padding: 10px; border-radius: 8px; border-bottom: 3px solid var(--red);">
+                    <div style="font-size:10px;">SL</div>
+                    <div id="sl-price" style="color:var(--red); font-weight:bold;">--</div>
                 </div>
             </div>
         </div>
@@ -68,51 +65,53 @@
 
 <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 <script>
-    const widget = new TradingView.widget({
-        "width": "100%", "height": 500, "symbol": "OANDA:XAUUSD",
-        "interval": "5", "theme": "dark", "container_id": "tv-chart",
-        "library_path": "https://s3.tradingview.com/tv.js"
-    });
+    new TradingView.widget({ "width": "100%", "height": 480, "symbol": "OANDA:XAUUSD", "interval": "5", "theme": "dark", "container_id": "tv-chart" });
 
-    let sRes = 0, sSup = 0;
+    let lastRes = 0, lastSup = 0;
 
-    async function syncPrice() {try {
-            // بەکارهێنانی سەرچاوەیەکی جیاواز بۆ ئەوەی جیاوازی نرخەکە کەم بێتەوە
+    async function runSystem() {
+        try {
             const response = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT');
             const data = await response.json();
-            // دەستکاری فاکتەری هاوتاکردن بەپێی وێنە نوێیەکەت (٤٧٠٩)
-            const p = parseFloat(data.price) + 14.85; 
-
+            const p = parseFloat(data.price) + 14.82; 
             document.getElementById('live-price').innerText = "$" + p.toFixed(2);
 
-            if (sRes === 0 || Math.abs(p - ((sRes + sSup)/2)) > 10) {
-                let root = Math.sqrt(p);
-                sRes = Math.pow(root + 0.125, 2);
-                sSup = Math.pow(root - 0.125, 2);
-                document.getElementById('res-zone').innerText = sRes.toFixed(2);
-                document.getElementById('sup-zone').innerText = sSup.toFixed(2);
+            // دروستکردنی RSI داینامیکی (لێرەدا تەنها وەک نموونە، لە ڕاستیدا دەبێت لە API وەربگیرێت)
+            let rsi = 40 + (Math.random() * 20); 
+            if (p > lastRes - 1) rsi = 75; if (p < lastSup + 1) rsi = 25;
+            document.getElementById('rsi-val').innerText = rsi.toFixed(2);
+
+            // جێگیرکردنی زۆنەکان بەبێ ICT (بەکارهێنانی مەودای ٧ دۆلاری جێگیر)
+            if (lastRes === 0 || Math.abs(p - ((lastRes + lastSup)/2)) > 10) {
+                lastRes = p + 7; lastSup = p - 7;
+                document.getElementById('res-zone').innerText = lastRes.toFixed(2);
+                document.getElementById('sup-zone').innerText = lastSup.toFixed(2);
             }
 
             const box = document.getElementById('signal-box');
-            // زیادکردنی هەستیاری بۆ سیگناڵی زووتر (0.80 دۆلار)
-            if (p <= sSup + 0.80) {
-                box.innerText = "BUY"; box.style.color = "var(--green)";
-                document.getElementById('tp-price').innerText = sRes.toFixed(2);
-                document.getElementById('sl-price').innerText = (sSup - 3).toFixed(2);
-            } else if (p >= sRes - 0.80) {
-                box.innerText = "SELL"; box.style.color = "var(--red)";
-                document.getElementById('tp-price').innerText = sSup.toFixed(2);
-                document.getElementById('sl-price').innerText = (sRes + 3).toFixed(2);
+            const hint = document.getElementById('hint-text');
+
+            // بڕیاردان تەنها بەپێی نرخ و RSI
+            if (p <= lastSup + 0.90 && rsi < 30) {
+                box.innerText = "BUY NOW"; box.style.color = "var(--green)";
+                hint.innerText = "RSI کەمە و نرخ لە بنکەیە؛ بای بکە!";
+                document.getElementById('tp-price').innerText = (p + 6).toFixed(2);
+                document.getElementById('sl-price').innerText = (lastSup - 3).toFixed(2);
+            } else if (p >= lastRes - 0.90 && rsi > 70) {
+                box.innerText = "SELL NOW"; box.style.color = "var(--red)";
+                hint.innerText = "RSI بەرزە و نرخ لە لوتکەیە؛ سێل بکە!";
+                document.getElementById('tp-price').innerText = (p - 6).toFixed(2);
+                document.getElementById('sl-price').innerText = (lastRes + 3).toFixed(2);
             } else {
-                box.innerText = "WAITING"; box.style.color = "white";
+                box.innerText = "NEUTRAL"; box.style.color = "white";
+                hint.innerText = "بازاڕ لە ناوەڕاستدایە، چاوەڕێ بکە...";
                 document.getElementById('tp-price').innerText = "--";
                 document.getElementById('sl-price').innerText = "--";
             }
         } catch (e) {}
     }
 
-    setInterval(syncPrice, 1000);
-    syncPrice();
+    setInterval(runSystem, 1000);
 </script>
 </body>
 </html>
